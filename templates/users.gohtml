@@ -1,0 +1,30 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h1>It's users</h1>
+    <form action="/form" method="POST">
+        <input type="text" name="firstname">
+        <input type="text" name="lastname">
+        <input type="text" name="nickname">
+        <button type="submit">Submit</button>
+    </form>
+
+    <h4>You entered thats values</h4>
+    {{ $val := . }}
+    {{ if . }}
+    <ul>
+        <li>Firstname: {{ .First }}</li>
+        <li>Lastname: {{ .Last }}</li>
+        <li>Nickname: {{ .Nick }}</li>
+    </ul>
+    {{ end }}
+    <script>
+        console.log({{$val}})
+    </script>
+</body>
+</html>

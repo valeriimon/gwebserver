@@ -1,0 +1,28 @@
+header {
+    height: 80px;
+    background: whitesmoke;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#auth-block li {
+    position: relative;
+    cursor: pointer;
+    margin-right: 60px;
+    padding: 10px 38px;
+}
+
+#auth-block li:hover:after {
+    transition: all .1s;
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 2px;
+    background: black;
+}

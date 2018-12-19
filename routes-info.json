@@ -1,0 +1,19 @@
+[
+    {
+        "route_name": "get-user",
+        "related_app": "simple",
+        "route_description": "Some description",
+        "route_body": {
+            "user_id": "string",
+            "some_param": "number"
+        },
+        "route_params": [
+            {
+                "param": "user-id",
+                "description": ""
+            }
+            
+        ],
+        "route-queries": []  
+    }
+]
