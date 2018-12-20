@@ -70,7 +70,7 @@ func (db *Database) Save(bucket, key string, newData []byte) {
 }
 
 // GetData : get data from database;
-// If key length equels to zero returns whole bucket records
+// If key length equals to zero returns whole bucket records
 func (db *Database) GetData(bucket, key string) (results []interface{}, err error) {
 	db, err = db.openSession()
 	if err != nil {
@@ -119,7 +119,7 @@ func (db *Database) GetData(bucket, key string) (results []interface{}, err erro
 	return results, nil
 }
 
-// Get is simple method to get sample from database via simple transaction
+// Get : simple method to get sample from database via simple transaction
 func (db *Database) Get(bucket, key string) (interface{}, error) {
 	var result interface{}
 	db, err := db.openSession()
@@ -148,6 +148,74 @@ func (db *Database) Get(bucket, key string) (interface{}, error) {
 	}
 
 	return result, nil
+}
+
+func (db *Database) Delete(bucket, key string) error {
+	db, err := db.openSession()
+	if err != nil {
+		return err
+	}
+	defer db.ref.Close()
+
+	tx, err := db.ref.Begin(true)
+	if err != nil {
+		return err
+	}
+
+	b := tx.Bucket([]byte(DbMainBucket)).Bucket([]byte(bucket))
+	if b == nil {
+		return errors.New("Bucket Not Found")
+	}
+
+	err = b.Delete([]byte(key))
+	if err != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Search : implements database byte level search considering condition in callback func
+func (db *Database) Search(bucket, key string, cb func(k, v []byte) (bool, error)) ([]interface{}, error) {
+	var result interface{}
+	var results []interface{}
+
+	db, err := db.openSession()
+	if err != nil {
+		return nil, err
+	}
+	defer db.ref.Close()
+
+	tx, err := db.ref.Begin(false)
+	if err != nil {
+		return nil, err
+	}
+
+	b := tx.Bucket([]byte(DbMainBucket)).Bucket([]byte(key))
+	if b == nil {
+		return nil, errors.New("Bucket Not Found")
+	}
+
+	c := b.Cursor()
+	for k, v := c.First(); k != nil; k, v = c.Next() {
+		ok, err := cb(k, v)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			if err := json.Unmarshal(v, &result); err != nil {
+				return nil, err
+			}
+
+			results = append(results, result)
+		}
+	}
+
+	return results, nil
 }
 
 // Auth : simple users authentication via email and password
